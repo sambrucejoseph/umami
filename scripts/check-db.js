@@ -16,6 +16,7 @@ if (process.env.SKIP_DB_CHECK) {
 const url = new URL(process.env.DATABASE_URL);
 
 console.log(`Database endpoint host: ${url.hostname}`);
+console.log(`Database login role: ${url.username}`);
 
 const adapter = new PrismaPg(
   { connectionString: url.toString() },
