@@ -48,6 +48,9 @@ async function checkConnection() {
   try {
     await prisma.$connect();
 
+    const [identity] = await prisma.$queryRaw`select current_user, current_database()`;
+    console.log(`Database identity: ${identity.current_user} / ${identity.current_database}`);
+
     success('Database connection successful.');
   } catch (e) {
     throw new Error(`Unable to connect to the database: ${e.message}`);
