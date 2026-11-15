@@ -46,6 +46,15 @@ async function checkConnection() {
   try {
     await prisma.$connect();
 
+    const [audit] = await prisma.$queryRaw`
+      select
+        current_setting('server_version') as server_version,
+        pg_size_pretty(pg_database_size(current_database())) as database_size,
+        (select count(*)::int from "_prisma_migrations" where finished_at is not null and rolled_back_at is null) as applied_migrations,
+        (select string_agg(migration_name, ', ' order by finished_at) from "_prisma_migrations" where finished_at is not null and rolled_back_at is null) as migration_names
+    `;
+    console.log(`Database audit: PostgreSQL ${audit.server_version}; ${audit.database_size}; ${audit.applied_migrations} migrations; ${audit.migration_names}`);
+
     success('Database connection successful.');
   } catch (e) {
     throw new Error(`Unable to connect to the database: ${e.message}`);
